@@ -9,7 +9,8 @@
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
-    "module": "commonjs"
+    "module": "commonjs",
+    "skipLibCheck": true
   },
   "include": ["./src"]
 }

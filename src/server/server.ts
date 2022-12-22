@@ -2,7 +2,7 @@ import express from "express";
 import serveIndex from "serve-index";
 import fileUpload from "express-fileupload";
 import cors from "cors";
-import routes from "./routes";
+import loadRoutes from "./routes";
 import bodyParser from "body-parser";
 import config from "../config";
 import {
@@ -77,9 +77,12 @@ export class Server {
       express.static(this.repository),
       serveIndex(this.repository, { icons: true })
     );
-    this.app.use("/", routes);
     this.app.use(genericErrorHandler);
     this.app.use(notFoundHandler);
+  }
+
+  async init() {
+    this.app.use("/", await loadRoutes());
   }
 
   async listen(callback?: () => void) {
@@ -107,11 +110,16 @@ function getSessionOptions(): session.SessionOptions {
   };
 }
 
-if (require.main === module) {
+async function initServer() {
   const server = new Server();
+  await server.init();
   server.app.listen(server.port, () =>
     SourcifyEventManager.trigger("Server.Started", {
       port: server.port,
     })
   );
+}
+
+if (require.main === module) {
+  initServer();
 }
